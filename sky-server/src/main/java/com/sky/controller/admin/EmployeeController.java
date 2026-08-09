@@ -95,6 +95,15 @@ public class EmployeeController {
 
     }
 
+    /**
+     * 员工状态修改
+     */
+    @PostMapping("/status/{status}")
+    public Result startOrStop(@PathVariable Integer status, Long id){
+        employeeService.startOrStop(status, id);
+        return Result.success();
+    }
+
 }
 
 
