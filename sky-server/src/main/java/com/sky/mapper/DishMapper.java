@@ -38,4 +38,11 @@ public interface DishMapper {
 
     @AutoFill(value = OperationType.UPDATE)
     void update(Dish dish);
+
+    /**
+     * 根据条件动态查询菜品列表（用于新增套餐时选择菜品）
+     * @param dish
+     * @return
+     */
+    List<Dish> list(Dish dish);
 }
