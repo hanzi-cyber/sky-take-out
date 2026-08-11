@@ -14,6 +14,7 @@ import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
+
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
@@ -21,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -82,16 +85,38 @@ public class DishServiceImpl implements DishService {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
 
-
             dishMapper.delete(ids);
 
             dishFlavorMapper.deleteByDishId(ids);
+    }
+
+    @Override
+    public DishVO getById(Long id) {
+        Dish dish = dishMapper.getById(id);
+
+        List<DishFlavor> flavors = dishFlavorMapper.listByDishId(id);
+        DishVO dishVO=new DishVO();
+        BeanUtils.copyProperties(dish, dishVO);
+        dishVO.setFlavors(flavors);
+        return dishVO;
+    }
+
+    @Override
+    public void update(DishDTO dishDTO) {
+        Dish dish=new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        dishMapper.update(dish);
 
 
+        Long dishId = dish.getId();
+        dishFlavorMapper.deleteByDishId(Collections.singletonList(dishId));
 
+        List<DishFlavor> flavors = dishDTO.getFlavors();
 
-
-
+        if(flavors!=null && flavors.size()>0){
+            flavors.forEach(flavor -> flavor.setDishId(dishId));
+            dishFlavorMapper.insertBatch(flavors);
+        }
     }
 
 

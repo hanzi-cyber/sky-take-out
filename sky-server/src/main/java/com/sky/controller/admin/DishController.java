@@ -26,7 +26,7 @@ public class DishController {
         dishService.save(dishDTO);
         return Result.success();
     }
-    /**
+    /**+
      * 分页查询菜品
      */
     @GetMapping("/page")
@@ -41,6 +41,19 @@ public class DishController {
         return Result.success();
 
     }
+
+    @GetMapping("/{id}")
+    public Result<DishVO> get(@PathVariable Long id){
+        DishVO dishVO = dishService.getById(id);
+        return Result.success(dishVO);
+    }
+
+    @PutMapping
+    public Result update(@RequestBody DishDTO dishDTO) {
+        dishService.update(dishDTO);
+        return Result.success();
+    }
+
 }
 
 
