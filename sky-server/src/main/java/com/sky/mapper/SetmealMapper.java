@@ -8,6 +8,7 @@ import com.sky.enumeration.OperationType;
 import com.sky.vo.SetmealVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface SetmealMapper {
@@ -26,4 +27,7 @@ public interface SetmealMapper {
 
     @AutoFill(value = OperationType.INSERT)
     Long insert(Setmeal setmeal);
+
+
+    void startOrStop(Integer status, Long id);
 }

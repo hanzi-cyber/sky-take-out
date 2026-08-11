@@ -56,4 +56,9 @@ public class SetmealServiceImpl implements SetmealService {
             setmealDishMapper.insert(setmealDishes);
         }
     }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        setmealMapper.startOrStop(status,id);
+    }
 }
