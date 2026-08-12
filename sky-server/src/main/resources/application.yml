@@ -21,7 +21,12 @@ spring:
       min-evictable-idle-time-millis: 60000      # 连接最小空闲时间(毫秒),60秒
       keep-alive: true                # 开启保活,主动维持空闲连接,避免被MySQL/网络设备断开
       phy-timeout-millis: 300000      # 物理连接超时时间(毫秒),5分钟强制回收重建
-      max-wait: 60000                 # 获取连接最大等待时间(毫秒)
+      max-wait: 60000
+  redis:
+    host: ${sky.redis.host}
+    port: ${sky.redis.port}
+    password: ${sky.redis.password}
+    database: ${sky.redis.database}
 
 mybatis:
   #mapper配置文件
