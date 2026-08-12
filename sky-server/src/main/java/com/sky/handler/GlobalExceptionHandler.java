@@ -42,4 +42,14 @@ public class GlobalExceptionHandler {
         return Result.error("未知错误");
     }
 
+    /**
+     * 兜底异常处理,捕获未被上面两个handler匹配到的所有异常
+     * 确保任何异常都返回统一格式的JSON,前端能正常显示错误信息
+     */
+    @ExceptionHandler
+    public Result exceptionHandler(Exception ex){
+        log.error("异常信息：{}", ex.getMessage());
+        return Result.error("未知错误");
+    }
+
 }

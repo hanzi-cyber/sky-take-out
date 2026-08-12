@@ -10,6 +10,8 @@ import com.sky.vo.SetmealVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin/setmeal")
 public class SetmealController {
@@ -46,6 +48,13 @@ public class SetmealController {
         setmealService.update(setmealDTO);
         return Result.success();
     }
+
+   @DeleteMapping
+    public Result delete(@RequestParam List<Long> ids){
+        setmealService.delete(ids);
+        return Result.success();
+   }
+
 
 
 }

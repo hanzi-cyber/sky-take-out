@@ -11,6 +11,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Mapper
 public interface SetmealMapper {
 
@@ -32,9 +34,11 @@ public interface SetmealMapper {
 
     void startOrStop(Integer status, Long id);
 
-    @Select("select s.*,c.name from setmeal s left join category c on c.id=s.category_id where s.id=#{id}")
-    Setmeal getById(Long id);
+    @Select("select s.*, c.name as categoryName from setmeal s left join category c on c.id=s.category_id where s.id=#{id}")
+    SetmealVO getById(Long id);
 
     @AutoFill(value = OperationType.UPDATE)
     void update(Setmeal setmeal);
+
+    void delete(List<Long> ids);
 }
