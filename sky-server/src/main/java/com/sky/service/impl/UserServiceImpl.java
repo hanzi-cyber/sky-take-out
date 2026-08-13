@@ -53,9 +53,11 @@ public class UserServiceImpl implements UserService {
         String s = HttpClientUtil.doGet(WX_LOGIN, map);
         JSONObject jsonObject=JSON.parseObject(s);
         String openid = jsonObject.getString("openid");
+        // 微信返回了错误码,说明 code 非法或 appid/secret 配置错误
+        if (openid == null && jsonObject.containsKey("errcode")) {
+            throw new LoginFailedException(MessageConstant.LOGIN_FAILED + ":" + jsonObject.getString("errmsg"));
+        }
         return openid;
-
-
     }
 
 }

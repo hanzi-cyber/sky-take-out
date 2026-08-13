@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.mapper.ShoppingCartMapper">
+
+    <select id="get" resultType="com.sky.entity.ShoppingCart">
+        select * from shopping_cart
+        <where>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="dishId != null">and dish_id = #{dishId}</if>
+            <if test="setmealId != null">and setmeal_id = #{setmealId}</if>
+            <!-- 口味非空字符串时按具体口味匹配 -->
+            <if test="dishFlavor != null and dishFlavor != ''">and dish_flavor = #{dishFlavor}</if>
+            <!-- 口味为 null 或空字符串时,匹配数据库中 null 或空的记录(即该菜品没选口味) -->
+            <if test="dishFlavor == null or dishFlavor == ''">and (dish_flavor is null or dish_flavor = '')</if>
+        </where>
+    </select>
+</mapper>
