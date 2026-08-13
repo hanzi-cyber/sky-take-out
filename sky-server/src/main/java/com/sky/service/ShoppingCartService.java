@@ -6,4 +6,6 @@ public interface ShoppingCartService {
     void add(ShoppingCartDTO shoppingCartDTO);
 
     void clean();
+
+    void delete(ShoppingCartDTO shoppingCartDTO);
 }
