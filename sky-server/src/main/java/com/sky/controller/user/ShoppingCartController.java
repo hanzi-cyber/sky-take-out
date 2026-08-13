@@ -34,4 +34,10 @@ public class ShoppingCartController {
         List<ShoppingCart> shoppingCartList = shoppingCartMapper.get(shoppingCart);
         return Result.success(shoppingCartList);
     }
+
+    @DeleteMapping("/clean")
+    public Result clean(){
+        shoppingCartService.clean();
+        return Result.success();
+    }
 }

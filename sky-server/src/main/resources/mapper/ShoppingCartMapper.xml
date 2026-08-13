@@ -11,8 +11,11 @@
             <if test="setmealId != null">and setmeal_id = #{setmealId}</if>
             <!-- 口味非空字符串时按具体口味匹配 -->
             <if test="dishFlavor != null and dishFlavor != ''">and dish_flavor = #{dishFlavor}</if>
-            <!-- 口味为 null 或空字符串时,匹配数据库中 null 或空的记录(即该菜品没选口味) -->
-            <if test="dishFlavor == null or dishFlavor == ''">and (dish_flavor is null or dish_flavor = '')</if>
+            <!-- 只有 add 场景(dishId 或 setmealId 不为 null)且口味为空时,才过滤空口味记录;
+                 list 场景(只有 userId)不加口味条件,避免有口味的菜品被排除 -->
+            <if test="(dishId != null or setmealId != null) and (dishFlavor == null or dishFlavor == '')">
+                and (dish_flavor is null or dish_flavor = '')
+            </if>
         </where>
     </select>
 </mapper>
