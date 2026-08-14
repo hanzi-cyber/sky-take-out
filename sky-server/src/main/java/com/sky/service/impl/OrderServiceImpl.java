@@ -55,6 +55,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private WebSocketServer webSocketServer;
 
+    @Autowired
+    private DishMapper dishMapper;
+
     /**
      * 用户下单
      *
@@ -189,23 +192,25 @@ public class OrderServiceImpl implements OrderService {
     public PageResult page(OrdersPageQueryDTO ordersPageQueryDTO) {
         Long userId = BaseContext.getCurrentId();
         ordersPageQueryDTO.setUserId(userId);
-        log.info("历史订单查询：userId={}, page={}, pageSize={}", userId, ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
         PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
-        Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO);
+        Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO); // 注意返回类型是 Page<Orders>
 
-        // 将每个订单封装为 OrderVO，并填充菜品信息字符串 orderDishes
-        List<OrderVO> orderVOList = new ArrayList<>();
-        if (page.getResult() != null && !page.getResult().isEmpty()) {
-            for (Orders orders : page.getResult()) {
-                OrderVO orderVO = new OrderVO();
-                BeanUtils.copyProperties(orders, orderVO);
-                orderVO.setOrderDishes(getOrderDishesStr(orders));
-                orderVOList.add(orderVO);
-            }
+        List<OrderVO> voList = new ArrayList<>();
+        for (Orders order : page.getResult()) {
+            OrderVO vo = new OrderVO();
+            BeanUtils.copyProperties(order, vo);
+
+            // 根据订单ID查询订单明细
+            List<OrderDetail> details = orderDetailMapper.selectByOrderId(order.getId());
+            vo.setOrderDetailList(details);
+
+            // 如果需要菜品信息，还可以根据明细中的菜品ID批量查询菜品，并填充 orderDishes
+//             List<Dish> dishes = dishMapper.getByIds()
+//             vo.setOrderDishes(dishes);
+
+            voList.add(vo);
         }
-
-        log.info("历史订单查询结果：total={}, size={}", page.getTotal(), orderVOList.size());
-        return new PageResult(page.getTotal(), orderVOList);
+        return new PageResult(page.getTotal(), voList);
     }
 
     /**
@@ -287,21 +292,6 @@ public class OrderServiceImpl implements OrderService {
         webSocketServer.sendToAllClient(json);
     }
 
-    /**
-     * 拼接订单菜品信息字符串，格式：宫保鸡丁*3;可乐*1;
-     *
-     * @param orders
-     * @return
-     */
-    private String getOrderDishesStr(Orders orders) {
-        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
-        if (CollectionUtils.isEmpty(orderDetailList)) {
-            return "";
-        }
-        List<String> orderDishList = orderDetailList.stream()
-                .map(x -> x.getName() + "*" + x.getNumber() + ";")
-                .collect(Collectors.toList());
-        return String.join("", orderDishList);
-    }
+
 
 }
