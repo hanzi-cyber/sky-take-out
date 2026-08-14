@@ -1,6 +1,9 @@
 package com.sky.service;
 
+import com.github.pagehelper.Page;
 import com.sky.dto.*;
+import com.sky.entity.Orders;
+import com.sky.result.PageResult;
 import com.sky.vo.*;
 
 public interface OrderService {
@@ -25,4 +28,25 @@ public interface OrderService {
      */
     void paySuccess(String outTradeNo);
 
+    OrderVO getOrderVO(Long id);
+
+    PageResult page(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    /**
+     * 用户取消订单
+     * @param id 订单id
+     */
+    void cancel(Long id) throws Exception;
+
+    /**
+     * 再来一单
+     * @param id 订单id
+     */
+    void repetition(Long id);
+
+    /**
+     * 催单
+     * @param id 订单id
+     */
+    void reminder(Long id);
 }
