@@ -14,6 +14,12 @@ public interface ShoppingCartMapper {
 
     List<ShoppingCart> get(ShoppingCart shoppingCart);
 
+    /**
+     * 批量插入购物车数据
+     * @param shoppingCarts
+     */
+    void insertBatch(List<ShoppingCart> shoppingCarts);
+
     @Update("update shopping_cart set number = #{number} where id = #{id}")
     void update(ShoppingCart shoppingCart);
 

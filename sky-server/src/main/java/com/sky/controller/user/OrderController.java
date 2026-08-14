@@ -1,16 +1,23 @@
 package com.sky.controller.user;
 
+import com.github.pagehelper.Page;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
+import com.sky.entity.Orders;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 订单
@@ -51,6 +58,58 @@ public class OrderController {
         OrderPaymentVO orderPaymentVO = orderService.payment(ordersPaymentDTO);
         log.info("生成预支付交易单：{}", orderPaymentVO);
         return Result.success(orderPaymentVO);
+    }
+
+    /**
+     * 订单查询详情
+     */
+    @GetMapping("/orderDetail/{id}")
+    public Result<OrderVO> orderDetail(@PathVariable Long id) {
+        log.info("订单查询详情：{}", id);
+        OrderVO orderVO = orderService.getOrderVO(id);
+        return Result.success(orderVO);
+    }
+    /**
+     * 查询历史订单
+     */
+    @GetMapping("historyOrders")
+    public Result<PageResult> historyOrders(OrdersPageQueryDTO ordersPageQueryDTO) {
+        log.info("查询历史订单：{}", ordersPageQueryDTO);
+        PageResult page = orderService.page(ordersPageQueryDTO);
+        return Result.success(page);
+    }
+
+    /**
+     * 取消订单
+     */
+    @PutMapping("/cancel/{id}")
+    @ApiOperation("取消订单")
+    public Result cancel(@PathVariable Long id) throws Exception {
+        log.info("取消订单：{}", id);
+        orderService.cancel(id);
+        return Result.success();
+    }
+
+    /**
+     * 再来一单
+     */
+    @PostMapping("/repetition/{id}")
+    @ApiOperation("再来一单")
+    public Result repetition(@PathVariable Long id) {
+        log.info("再来一单：{}", id);
+        orderService.repetition(id);
+        return Result.success();
+    }
+
+    /**
+     * 催单
+     */
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("催单")
+    public Result reminder(@PathVariable Long id) {
+        log.info("催单：{}", id);
+        orderService.reminder(id);
+        return Result.success();
     }
 
 }
