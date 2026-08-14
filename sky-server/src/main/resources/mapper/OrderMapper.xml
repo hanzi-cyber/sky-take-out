@@ -43,14 +43,12 @@
         where id = #{id}
     </update>
     <select id="pageQuery" resultType="com.sky.entity.Orders">
-        select * from orders
+        select * from orders o
         <where>
-            user_id = #{userId}
-            <if test="status != null">
-                and status = #{status}
-            </if>
+            <if test="userId != null"> and o.user_id = #{userId} </if>
+            <if test="status != null"> and o.status = #{status} </if>
         </where>
-        order by order_time desc
+        order by o.order_time desc
     </select>
 
 </mapper>
