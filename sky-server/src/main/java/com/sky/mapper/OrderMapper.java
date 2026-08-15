@@ -8,6 +8,8 @@ import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -43,4 +45,18 @@ public interface OrderMapper {
     Double getTurnover(@Param("beginTime") LocalDateTime beginTime,
                        @Param("endTime") LocalDateTime endTime,
                        @Param("status") Integer status);
+
+    Integer getOrderCount(@Param("beginTime")LocalDateTime beginTime,@Param("endTime") LocalDateTime endTime);
+
+    Integer getTotalOrderCount(@Param("startTime") LocalDateTime startTime,
+                               @Param("breakTime") LocalDateTime breakTime);
+
+    Integer getValidOrderCount(@Param("beginTime") LocalDateTime beginTime,
+                               @Param("endTime") LocalDateTime endTime);
+
+    Integer getTotalValidOrderCount(@Param("startTime") LocalDateTime startTime,
+                                    @Param("breakTime") LocalDateTime breakTime);
+
+    List<GoodsSalesDTO> getSalesTop10(@Param("beginTime") LocalDateTime beginTime,
+                                      @Param("endTime") LocalDateTime endTime);
 }
