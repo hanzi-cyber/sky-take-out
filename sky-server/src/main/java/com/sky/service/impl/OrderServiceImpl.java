@@ -152,6 +152,7 @@ public class OrderServiceImpl implements OrderService {
          */
         log.info("跳过微信支付，支付成功");
         paySuccess(ordersPaymentDTO.getOrderNumber());
+
         return new OrderPaymentVO();
     }
 
@@ -175,6 +176,13 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        Map map=new HashMap<>();
+        map.put("type", 1);//1表示来单提醒 2表示催单提醒
+        map.put("orderId", ordersDB.getId());
+        map.put("content", "订单号：" + ordersDB.getNumber());
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
     @Override
