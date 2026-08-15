@@ -13,6 +13,9 @@ public interface AdminOrderMapper {
 
     Page<Orders> page(OrdersPageQueryDTO ordersPageQueryDTO);
 
-    @Select("select count(*) from orders where status in (3,4,2) group by status;")
+    @Select("select count(case when status = 2 then 1 end) as toBeConfirmed, " +
+            "count(case when status = 3 then 1 end) as confirmed, " +
+            "count(case when status = 4 then 1 end) as deliveryInProgress " +
+            "from orders")
     OrderStatisticsVO countOrderStatistics();
 }
