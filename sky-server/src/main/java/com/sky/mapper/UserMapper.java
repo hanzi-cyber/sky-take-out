@@ -2,7 +2,10 @@ package com.sky.mapper;
 
 import com.sky.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.time.LocalDateTime;
 
 @Mapper
 public interface UserMapper {
@@ -15,4 +18,9 @@ public interface UserMapper {
 
     @Select("select * from user where id=#{userId}")
     User getById(Long userId);
+
+    Integer getNewUserCount(@Param("beginTime") LocalDateTime beginTime,
+                            @Param("endTime") LocalDateTime endTime);
+
+    Integer getTotalUserCount(@Param("endTime") LocalDateTime endTime);
 }

@@ -6,10 +6,10 @@ import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
@@ -37,4 +37,10 @@ public interface OrderMapper {
 
 
     Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
+
+
+
+    Double getTurnover(@Param("beginTime") LocalDateTime beginTime,
+                       @Param("endTime") LocalDateTime endTime,
+                       @Param("status") Integer status);
 }
