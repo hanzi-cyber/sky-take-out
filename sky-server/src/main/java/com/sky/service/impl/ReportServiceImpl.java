@@ -120,10 +120,11 @@ public class ReportServiceImpl implements ReportService {
         //有效订单总数
         Integer validOrderCount = orderMapper.getTotalValidOrderCount(startTime, breakTime);
         orderReportVO.setValidOrderCount(validOrderCount);
-        //订单完成率
+        //订单完成率，保留两位小数
         double orderCompletionRate = 0.0;
         if (totalOrderCount != null && totalOrderCount.doubleValue() != 0) {
             orderCompletionRate = (validOrderCount.doubleValue() / totalOrderCount.doubleValue());
+            orderCompletionRate = Math.round(orderCompletionRate * 100) / 100.0;
         }
         orderReportVO.setOrderCompletionRate(orderCompletionRate);
         return orderReportVO;
