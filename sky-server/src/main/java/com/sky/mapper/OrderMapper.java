@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.sky.dto.GoodsSalesDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
+import com.sky.vo.OrderOverViewVO;
 import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -59,4 +60,17 @@ public interface OrderMapper {
 
     List<GoodsSalesDTO> getSalesTop10(@Param("beginTime") LocalDateTime beginTime,
                                       @Param("endTime") LocalDateTime endTime);
+
+    /**
+     * 订单管理数据总览（各状态订单数量）
+     */
+    @Select("select count(id) as allOrders, " +
+            "count(case when status = 2 then 1 end) as waitingOrders, " +
+            "count(case when status = 3 then 1 end) as deliveredOrders, " +
+            "count(case when status = 5 then 1 end) as completedOrders, " +
+            "count(case when status = 6 then 1 end) as cancelledOrders " +
+            "from orders " +
+            "where order_time >= #{begin} and order_time <= #{end}")
+    OrderOverViewVO getOrderOverView(@Param("begin") LocalDateTime begin,
+                                     @Param("end") LocalDateTime end);
 }
