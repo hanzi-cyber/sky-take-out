@@ -5,14 +5,24 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.service.WorkSpaceService;
+import com.sky.vo.BusinessDataVO;
 import com.sky.vo.OrderReportVO;
 import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -27,6 +37,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private WorkSpaceService workSpaceService;
 
     @Override
     public TurnoverReportVO getTurnoverReport(LocalDate begin, LocalDate end) {
@@ -151,6 +164,64 @@ public class ReportServiceImpl implements ReportService {
         return salesTop10ReportVO;
     }
 
+
+    /**
+     * 导出最近30天的运营数据Excel报表
+     */
+    @Override
+    public void exportBusinessData(HttpServletResponse response) {
+        // 1. 查询最近30天的运营数据（不含今天，今天是进行中的数据）
+        LocalDate dateBegin = LocalDate.now().minusDays(30);
+        LocalDate dateEnd = LocalDate.now().minusDays(1);
+
+        // 概览数据：整个区间的汇总
+        BusinessDataVO businessData = workSpaceService.getBusinessData(
+                LocalDateTime.of(dateBegin, LocalTime.MIN), LocalDateTime.of(dateEnd, LocalTime.MAX));
+
+        // 2. 基于模板文件创建Excel
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板.xlsx");
+        try (XSSFWorkbook excel = new XSSFWorkbook(in)) {
+            XSSFSheet sheet = excel.getSheetAt(0);
+
+            // 第2行：时间区间（B2:G2已合并）
+            sheet.getRow(1).getCell(1).setCellValue("时间区间：" + dateBegin + "至" + dateEnd);
+
+            // 第4行：营业额、订单完成率、新增用户数
+            XSSFRow row = sheet.getRow(3);
+            row.getCell(2).setCellValue(businessData.getTurnover());
+            row.getCell(4).setCellValue(businessData.getOrderCompletionRate());
+            row.getCell(6).setCellValue(businessData.getNewUsers());
+
+            // 第5行：有效订单、平均客单价
+            row = sheet.getRow(4);
+            row.getCell(2).setCellValue(businessData.getValidOrderCount());
+            row.getCell(4).setCellValue(businessData.getUnitPrice());
+
+            // 第8行起：填充每日明细数据，共30天
+            int rowNum = 7;
+            for (LocalDate date = dateBegin; !date.isAfter(dateEnd); date = date.plusDays(1)) {
+                BusinessDataVO dailyData = workSpaceService.getBusinessData(
+                        LocalDateTime.of(date, LocalTime.MIN), LocalDateTime.of(date, LocalTime.MAX));
+                row = sheet.getRow(rowNum++);
+                row.getCell(1).setCellValue(date.toString());
+                row.getCell(2).setCellValue(dailyData.getTurnover());
+                row.getCell(3).setCellValue(dailyData.getValidOrderCount());
+                row.getCell(4).setCellValue(dailyData.getOrderCompletionRate());
+                row.getCell(5).setCellValue(dailyData.getUnitPrice());
+                row.getCell(6).setCellValue(dailyData.getNewUsers());
+            }
+
+            // 3. 通过输出流将Excel下载到客户端
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("content-disposition",
+                    "attachment;filename=" + URLEncoder.encode("运营数据报表", "UTF-8") + ".xlsx");
+            ServletOutputStream out = response.getOutputStream();
+            excel.write(out);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private LocalDateTime convertToLocalDateTimeBegin(LocalDate date) {
         return LocalDateTime.of(date, LocalTime.MIN);
