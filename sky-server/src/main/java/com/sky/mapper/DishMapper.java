@@ -5,6 +5,7 @@ import com.sky.annotation.AutoFill;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.enumeration.OperationType;
+import com.sky.vo.DishOverViewVO;
 import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
@@ -12,6 +13,7 @@ import org.apache.ibatis.annotations.Select;
 
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface DishMapper {
@@ -45,4 +47,12 @@ public interface DishMapper {
      * @return
      */
     List<Dish> list(Dish dish);
+
+    /**
+     * 菜品总览：查询已启售和已停售数量
+     */
+    @Select("select count(case when status = 1 then 1 end) as sold, " +
+            "count(case when status = 0 then 1 end) as discontinued " +
+            "from dish")
+    DishOverViewVO getDishOverView();
 }
